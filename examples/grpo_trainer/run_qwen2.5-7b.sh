@@ -8,7 +8,7 @@ python3 -m verl.trainer.main_ppo \
     data.val_batch_size=1312 \
     data.max_prompt_length=512 \
     data.max_response_length=1024 \
-    actor_rollout_ref.model.path=Qwen/Qwen2-7B-Instruct \
+    actor_rollout_ref.model.path=Qwen/Qwen2.5-7B-Instruct \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=256 \

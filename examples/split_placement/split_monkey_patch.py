@@ -143,7 +143,9 @@ def fit(self):
                                               adv_estimator=self.config.algorithm.adv_estimator,
                                               gamma=self.config.algorithm.gamma,
                                               lam=self.config.algorithm.lam,
-                                              num_repeat=self.config.actor_rollout_ref.rollout.n)
+                                              num_repeat=self.config.actor_rollout_ref.rollout.n,
+                                              length_penalty=self.config.algorithm.length_penalty,
+                                              length_penalty_alpha=self.config.algorithm.length_penalty_alpha)
 
                 # update critic
                 if self.use_critic:

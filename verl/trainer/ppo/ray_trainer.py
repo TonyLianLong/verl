@@ -116,9 +116,12 @@ def apply_kl_penalty(data: DataProto, kl_ctrl: core_algos.AdaptiveKLController, 
     return data, metrics
 
 
-def compute_advantage(data: DataProto, adv_estimator, gamma=1.0, lam=1.0, num_repeat=1):
+def compute_advantage(data: DataProto, adv_estimator, gamma=1.0, lam=1.0, num_repeat=1, length_penalty="v1", length_penalty_alpha=1.0):
     # prepare response group
     # TODO: add other ways to estimate advantages
+    if length_penalty:
+        assert adv_estimator == 'grpo', 'length_penalty is only supported for GRPO'
+    
     if adv_estimator == 'gae':
         values = data.batch['values']
         responses = data.batch['responses']
@@ -142,7 +145,7 @@ def compute_advantage(data: DataProto, adv_estimator, gamma=1.0, lam=1.0, num_re
         response_mask = attention_mask[:, -response_length:]
         advantages, returns = core_algos.compute_grpo_outcome_advantage(token_level_rewards=token_level_rewards,
                                                                         eos_mask=response_mask,
-                                                                        index=index)
+                                                                        index=index, length_penalty=length_penalty, length_penalty_alpha=length_penalty_alpha)
         data.batch['advantages'] = advantages
         data.batch['returns'] = returns
     elif adv_estimator == 'reinforce_plus_plus':
@@ -927,7 +930,9 @@ class RayPPOTrainer(object):
                                                   adv_estimator=self.config.algorithm.adv_estimator,
                                                   gamma=self.config.algorithm.gamma,
                                                   lam=self.config.algorithm.lam,
-                                                  num_repeat=self.config.actor_rollout_ref.rollout.n)
+                                                  num_repeat=self.config.actor_rollout_ref.rollout.n,
+                                                  length_penalty=self.config.algorithm.length_penalty,
+                                                  length_penalty_alpha=self.config.algorithm.length_penalty_alpha)
 
                     # update critic
                     if self.use_critic:
