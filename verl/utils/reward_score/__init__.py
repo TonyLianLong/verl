@@ -13,6 +13,7 @@
 # limitations under the License.
 # from . import gsm8k, math, prime_math, prime_code
 
+import os
 from verl.utils.import_utils import deprecated
 
 
@@ -36,21 +37,21 @@ def default_compute_score(data_source, solution_str, ground_truth, extra_info=No
         from . import gsm8k
 
         res = gsm8k.compute_score(solution_str, ground_truth)
-    elif data_source in ["lighteval/MATH", "DigitalLearningGmbH/MATH-lighteval"]:
-        from . import math
+    elif data_source == "math_dapo" or data_source.startswith("aime") or os.environ.get("USE_DAPO_REWARD", "false").lower() == "true":
+        from . import math_dapo
 
-        res = math.compute_score(solution_str, ground_truth)
+        res = math_dapo.compute_score(solution_str, ground_truth)
+    elif data_source in ["lighteval/MATH", "DigitalLearningGmbH/MATH-lighteval", "math-ai/math500", "math-ai/minervamath", "math-ai/olympiadbench", "math-ai/amc23", "math-ai/aime24", "math-ai/aime25", "agentica-org/DeepScaleR-Preview-Dataset"]:
+        # from . import math
+
+        # res = math.compute_score(solution_str, ground_truth)
         # [Optional] Math-Verify Integration
         # For enhanced accuracy, consider utilizing Math-Verify (https://github.com/huggingface/Math-Verify).
         # Note: Math-Verify needs to be manually installed via pip: `pip install math-verify`.
         # To use it, override the `compute_score` function with the following implementation:
 
-        # from . import math_verify
-        # res = math_verify.compute_score(solution_str, ground_truth)
-    elif data_source == "math_dapo" or data_source.startswith("aime"):
-        from . import math_dapo
-
-        res = math_dapo.compute_score(solution_str, ground_truth)
+        from . import math_verify
+        res = math_verify.compute_score(solution_str, ground_truth)
     elif data_source in [
         "numina_aops_forum",
         "numina_synthetic_math",
